@@ -44,6 +44,9 @@
     "ws": "^8.13.0",
     "zustand": "^4.3.7"
   },
+  "resolutions": {
+    "@react-three/drei/camera-controls": "../../../../camera-controls"
+  },
   "scripts": {
     "start": "vite --host",
     "build": "tsc && vite build",

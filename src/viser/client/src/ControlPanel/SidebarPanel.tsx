@@ -27,7 +27,7 @@ export default function SidebarPanel({
   collapsible: boolean;
   width: string;
 }) {
-  const [collapsed, { toggle: toggleCollapsed }] = useDisclosure(false);
+  const [collapsed, { toggle: toggleCollapsed }] = useDisclosure(true);
 
   const collapsedView = (
     <Box

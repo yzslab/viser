@@ -47,7 +47,8 @@ export default function ControlPanel(props: {
   control_layout: ThemeConfigurationMessage["control_layout"];
 }) {
   const theme = useMantineTheme();
-  const useMobileView = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`);
+  // const useMobileView = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`);
+  const useMobileView = false;
 
   // TODO: will result in unnecessary re-renders.
   const viewer = React.useContext(ViewerContext)!;

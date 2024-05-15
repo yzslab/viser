@@ -1,12 +1,14 @@
 import { ViewerContext } from "./App";
 import { makeThrottledMessageSender } from "./WebsocketFunctions";
 import { CameraControls } from "@react-three/drei";
+import {default as VanillaCameraControls} from 'camera-controls';
 import { useThree } from "@react-three/fiber";
 import * as holdEvent from "hold-event";
 import React, { useContext, useRef } from "react";
 import { PerspectiveCamera } from "three";
 import * as THREE from "three";
 import { computeT_threeworld_world } from "./WorldTransformUtils";
+import {getFloatParam, getMinAltitude} from "./utils";
 
 export function SynchronizedCameraControls() {
   const viewer = useContext(ViewerContext)!;
@@ -16,6 +18,8 @@ export function SynchronizedCameraControls() {
     viewer.websocketRef,
     20,
   );
+
+  const minAltitude : number = getMinAltitude();
 
   // Helper for resetting camera poses.
   const initialCameraRef = useRef<{
@@ -53,6 +57,7 @@ export function SynchronizedCameraControls() {
   const R_world_camera = new THREE.Quaternion();
   const t_world_camera = new THREE.Vector3();
   const scale = new THREE.Vector3();
+  const minAltitudeVector = new THREE.Vector3();
   const sendCamera = React.useCallback(() => {
     const three_camera = camera;
     const camera_control = viewer.cameraControlRef.current;
@@ -61,6 +66,23 @@ export function SynchronizedCameraControls() {
       // Camera controls not yet ready, let's re-try later.
       setTimeout(sendCamera, 10);
       return;
+    }
+
+    const cameraTarget = camera_control.getTarget(lookAt);
+    const cameraTargetAltitude = cameraTarget.dot(three_camera.up);
+    // console.log("cameraTargetAltitude=" + cameraTargetAltitude);
+    if (cameraTargetAltitude < minAltitude) {
+      minAltitudeVector.copy(three_camera.up).multiplyScalar(minAltitude - cameraTargetAltitude);
+      cameraTarget.add(minAltitudeVector);
+      camera_control.setTarget(cameraTarget.x, cameraTarget.y, cameraTarget.z);
+      return;
+    }
+
+    const cameraPositionAltitude = three_camera.position.dot(three_camera.up);
+    // console.log("cameraPositionAltitude=" + cameraPositionAltitude);
+    if (cameraPositionAltitude < minAltitude) {
+      minAltitudeVector.copy(three_camera.up).multiplyScalar(minAltitude - cameraPositionAltitude);
+      camera.position.add(minAltitudeVector);
     }
 
     // We put Z up to match the scene tree, and convert threejs camera convention
@@ -130,6 +152,23 @@ export function SynchronizedCameraControls() {
   React.useEffect(() => {
     const cameraControls = viewer.cameraControlRef.current!;
 
+    cameraControls.minDistance = 0.01;
+    cameraControls.infinityDolly = true;
+    cameraControls.maxDistance = Infinity;
+    cameraControls.maxPolarAngle = getFloatParam("maxPolarAngle", Math.PI);
+    cameraControls.dollySpeed = 0.1;
+    cameraControls.minDollySpeed = 0.01;
+    cameraControls.dollyToCursor = false;
+    cameraControls.verticalDragToForward = true;
+    cameraControls.noVerticalDragToForwardMouseButtons = VanillaCameraControls.MOUSE_BUTTON.MIDDLE;
+    cameraControls.noVerticalDragToForwardTouches = 3;
+    cameraControls.mouseButtons.middle = VanillaCameraControls.ACTION.TRUCK;
+    cameraControls.touches.one = VanillaCameraControls.ACTION.TOUCH_TRUCK;
+    cameraControls.touches.two = VanillaCameraControls.ACTION.TOUCH_DOLLY_ROTATE;
+    cameraControls.touches.three = VanillaCameraControls.ACTION.TOUCH_TRUCK;
+
+    const speed = getFloatParam("speed", 1.);
+
     const wKey = new holdEvent.KeyboardKeyHold("KeyW", 20);
     const aKey = new holdEvent.KeyboardKeyHold("KeyA", 20);
     const sKey = new holdEvent.KeyboardKeyHold("KeyS", 20);
@@ -140,22 +179,22 @@ export function SynchronizedCameraControls() {
     // TODO: these event listeners are currently never removed, even if this
     // component gets unmounted.
     aKey.addEventListener("holding", (event) => {
-      cameraControls.truck(-0.002 * event?.deltaTime, 0, true);
+      cameraControls.truck(-0.002 * event?.deltaTime * speed, 0, true);
     });
     dKey.addEventListener("holding", (event) => {
-      cameraControls.truck(0.002 * event?.deltaTime, 0, true);
+      cameraControls.truck(0.002 * event?.deltaTime * speed, 0, true);
     });
     wKey.addEventListener("holding", (event) => {
-      cameraControls.forward(0.002 * event?.deltaTime, true);
+      cameraControls.forward(0.002 * event?.deltaTime * speed, true);
     });
     sKey.addEventListener("holding", (event) => {
-      cameraControls.forward(-0.002 * event?.deltaTime, true);
+      cameraControls.forward(-0.002 * event?.deltaTime * speed, true);
     });
     qKey.addEventListener("holding", (event) => {
-      cameraControls.elevate(-0.002 * event?.deltaTime, true);
+      cameraControls.elevate(-0.002 * event?.deltaTime * speed, true);
     });
     eKey.addEventListener("holding", (event) => {
-      cameraControls.elevate(0.002 * event?.deltaTime, true);
+      cameraControls.elevate(0.002 * event?.deltaTime * speed, true);
     });
 
     const leftKey = new holdEvent.KeyboardKeyHold("ArrowLeft", 20);

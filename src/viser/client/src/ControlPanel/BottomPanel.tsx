@@ -15,7 +15,7 @@ export default function BottomPanel({
   children: string | React.ReactNode;
 }) {
   const panelWrapperRef = React.useRef<HTMLDivElement>(null);
-  const [expanded, { toggle: toggleExpanded }] = useDisclosure(true);
+  const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   return (
     <BottomPanelContext.Provider
       value={{

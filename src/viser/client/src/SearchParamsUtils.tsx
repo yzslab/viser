@@ -9,6 +9,7 @@ export function syncSearchParamServer(server: string) {
 }
 
 function setServerParams(serverParams: string[]) {
+  return;
   // No need to update the URL bar if the websocket port matches the HTTP port.
   // So if we navigate to http://localhost:8081, this should by default connect to ws://localhost:8081.
   if (
