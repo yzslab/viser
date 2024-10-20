@@ -401,7 +401,7 @@ function ViewerCanvas({ children }: { children: React.ReactNode }) {
       <SceneContextSetter />
       <SynchronizedCameraControls />
       <SceneNodeThreeObject name="" parent={null} />
-      <Environment path="/hdri/" files="potsdamer_platz_1k.hdr" />
+      <Environment path="./hdri/" files="potsdamer_platz_1k.hdr" />
       <directionalLight color={0xffffff} intensity={1.0} position={[0, 1, 0]} />
       <directionalLight
         color={0xffffff}
@@ -598,7 +598,7 @@ function ViserLogo() {
           onClick={openAbout}
           title="About Viser"
         >
-          <Image src="/logo.svg" style={{ width: "2.5em", height: "auto" }} />
+          <Image src="./logo.svg" style={{ width: "2.5em", height: "auto" }} />
         </Box>
       </Tooltip>
       <Modal

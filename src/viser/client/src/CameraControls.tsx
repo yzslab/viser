@@ -1,6 +1,7 @@
 import { ViewerContext } from "./App";
 import { makeThrottledMessageSender } from "./WebsocketFunctions";
 import { CameraControls } from "@react-three/drei";
+import {default as VanillaCameraControls} from 'camera-controls';
 import { useThree } from "@react-three/fiber";
 import * as holdEvent from "hold-event";
 import React, { useContext, useRef } from "react";
@@ -129,6 +130,21 @@ export function SynchronizedCameraControls() {
   // Keyboard controls.
   React.useEffect(() => {
     const cameraControls = viewer.cameraControlRef.current!;
+
+    cameraControls.minDistance = 0.01;
+    cameraControls.infinityDolly = true;
+    cameraControls.maxDistance = Infinity;
+    cameraControls.maxPolarAngle = Math.PI;
+    cameraControls.dollySpeed = 0.1;
+    cameraControls.minDollySpeed = 0.01;
+    cameraControls.dollyToCursor = false;
+    cameraControls.verticalDragToForward = true;
+    cameraControls.noVerticalDragToForwardMouseButtons = VanillaCameraControls.MOUSE_BUTTON.MIDDLE;
+    cameraControls.noVerticalDragToForwardTouches = 3;
+    cameraControls.mouseButtons.middle = VanillaCameraControls.ACTION.TRUCK;
+    cameraControls.touches.one = VanillaCameraControls.ACTION.TOUCH_TRUCK;
+    cameraControls.touches.two = VanillaCameraControls.ACTION.TOUCH_DOLLY_ROTATE;
+    cameraControls.touches.three = VanillaCameraControls.ACTION.TOUCH_TRUCK;
 
     const wKey = new holdEvent.KeyboardKeyHold("KeyW", 20);
     const aKey = new holdEvent.KeyboardKeyHold("KeyA", 20);

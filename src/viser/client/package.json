@@ -2,6 +2,7 @@
   "name": "viser",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@mantine/core": "^7.6.2",
     "@mantine/dates": "^7.6.2",
@@ -45,9 +46,12 @@
     "ws": "^8.13.0",
     "zustand": "^4.3.7"
   },
+  "resolutions": {
+    "@react-three/drei/camera-controls": "../../../../camera-controls"
+  },
   "scripts": {
     "start": "vite --host",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --base=./",
     "serve": "vite preview"
   },
   "eslintConfig": {
